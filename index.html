@@ -1,0 +1,606 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MMA Guard Breakdown</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0b0b0d;
+  --panel: #16161a;
+  --panel-2: #1e1e23;
+  --border: #2a2a30;
+  --red: #b3122a;
+  --red-bright: #e21f3c;
+  --gold: #c9a227;
+  --gold-bright: #e8c35a;
+  --text: #ececec;
+  --text-dim: #9a9aa2;
+  --text-faint: #6a6a72;
+  --good: #3fa34d;
+  --bad: #e21f3c;
+  --display: "Oswald", "Arial Narrow", sans-serif;
+  --body: "Inter", -apple-system, sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--bg);
+  background-image:
+    radial-gradient(ellipse 900px 500px at 15% -10%, rgba(179,18,42,0.14), transparent),
+    radial-gradient(ellipse 900px 500px at 85% 0%, rgba(201,162,39,0.07), transparent);
+  color: var(--text);
+  font-family: var(--body);
+  font-size: 15px;
+  min-height: 100vh;
+}
+.app {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 18px;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 20px 20px 28px;
+}
+
+/* ---------- header ---------- */
+.topbar { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; border-bottom: 1px solid var(--border); padding-bottom: 14px; }
+.brand { font-family: var(--display); font-weight: 700; font-size: 28px; letter-spacing: 1px; text-transform: uppercase; line-height: 1.1; }
+.brand span { color: var(--red-bright); }
+.brand small { display: block; font-family: var(--body); font-weight: 400; font-size: 13px; color: var(--text-dim); letter-spacing: .3px; text-transform: none; margin-top: 4px; }
+.sortbox { display: flex; gap: 6px; }
+.sortbox button {
+  font-family: var(--display); text-transform: uppercase; letter-spacing: 1px; font-size: 13px;
+  padding: 8px 16px; background: var(--panel); border: 1px solid var(--border); color: var(--text-dim);
+  cursor: pointer; border-radius: 4px; transition: all .15s;
+}
+.sortbox button:hover { border-color: var(--gold); color: var(--text); }
+.sortbox button.on { background: linear-gradient(180deg, var(--red-bright), var(--red)); border-color: var(--red-bright); color: #fff; }
+
+/* ---------- main 3-column layout ---------- */
+.stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 340px) minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+.left, .right { display: flex; flex-direction: column; gap: 12px; }
+
+.rank-tag {
+  align-self: flex-start; font-family: var(--display); font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--text-dim); border: 1px solid var(--border); border-radius: 3px; padding: 3px 8px;
+}
+.guard-name { font-family: var(--display); font-weight: 700; font-size: clamp(32px, 4vw, 46px); line-height: 1.05; margin: 0; text-transform: uppercase; letter-spacing: .5px; }
+.tagline { color: var(--text-dim); font-size: 15px; line-height: 1.5; margin: 0; max-width: 52ch; }
+
+.rating-row { display: flex; align-items: center; gap: 16px; background: var(--panel); border: 1px solid var(--border); border-radius: 6px; padding: 12px 16px; }
+.rating-num { font-family: var(--display); font-weight: 600; font-size: 48px; line-height: 1; color: var(--gold-bright); }
+.rating-num small { font-size: 18px; color: var(--text-faint); font-weight: 400; }
+.rating-meta { flex: 1; }
+.rating-meta .lbl { font-family: var(--display); letter-spacing: 1px; font-size: 12px; color: var(--text-dim); text-transform: uppercase; }
+.bar { height: 6px; background: var(--panel-2); border-radius: 3px; margin-top: 8px; overflow: hidden; }
+.bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--gold), var(--gold-bright)); border-radius: 3px; transition: width .35s ease; }
+.rank-line { font-size: 12px; color: var(--text-faint); margin-top: 6px; }
+
+.card { background: var(--panel); border: 1px solid var(--border); border-radius: 6px; padding: 14px 16px; }
+.card h3 { margin: 0 0 10px; font-family: var(--display); font-weight: 500; font-size: 14px; letter-spacing: 1px; text-transform: uppercase; color: var(--text-dim); }
+.card p { margin: 0; color: var(--text); line-height: 1.55; }
+.fighters { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-size: 13px; padding: 4px 9px; border-radius: 3px; background: var(--panel-2); border: 1px solid var(--border); color: var(--text); }
+.chip.warn { color: var(--text-dim); font-style: italic; }
+
+.list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.list li { position: relative; padding-left: 16px; line-height: 1.45; }
+.list li::before { content: ""; position: absolute; left: 0; top: .6em; width: 7px; height: 7px; border-radius: 1px; }
+.pros li::before { background: var(--good); }
+.cons li::before { background: var(--bad); }
+.pros { border-top: 2px solid var(--good); }
+.cons { border-top: 2px solid var(--bad); }
+
+.vs { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.vs .col h4 { margin: 0 0 8px; font-family: var(--display); font-weight: 500; font-size: 12px; letter-spacing: 1px; color: var(--text-dim); }
+.vs .good .chip { border-left: 3px solid var(--good); }
+.vs .bad .chip { border-left: 3px solid var(--bad); }
+
+/* ---------- center figure panel ---------- */
+.pedestal {
+  position: relative; height: 560px; border: 1px solid var(--border); border-radius: 6px;
+  background: linear-gradient(180deg, var(--panel) 0%, #101013 100%);
+  display: flex; align-items: flex-end; justify-content: center; overflow: hidden;
+}
+.platform {
+  position: absolute; left: 50%; bottom: 22px; width: 76%; height: 40px; transform: translateX(-50%);
+  border-radius: 50%; background: radial-gradient(ellipse, rgba(255,255,255,.07), transparent 70%);
+}
+.figure-wrap { position: relative; width: 100%; height: 100%; display: flex; align-items: flex-end; justify-content: center; padding: 36px 10px 20px; }
+#figure { height: 100%; width: auto; max-width: 100%; overflow: visible; }
+#guardImg { height: 100%; width: auto; max-width: 100%; object-fit: contain; object-position: bottom; position: relative; z-index: 1;
+  filter: drop-shadow(0 14px 16px rgba(0,0,0,.55)); transition: opacity .18s ease, transform .18s ease; }
+#guardImg.fade { opacity: 0; transform: translateY(6px); }
+.figure-wrap.has-img #figure, .figure-wrap:not(.has-img) #guardImg { display: none; }
+.nav-arrow {
+  position: absolute; top: 50%; transform: translateY(-50%); width: 34px; height: 34px; border-radius: 50%;
+  background: var(--panel-2); color: var(--text); border: 1px solid var(--border); cursor: pointer;
+  font-size: 18px; line-height: 1; z-index: 3; transition: border-color .15s;
+}
+.nav-arrow:hover { border-color: var(--gold); }
+.nav-arrow.prev { left: 10px; } .nav-arrow.next { right: 10px; }
+.counter { position: absolute; top: 12px; left: 0; right: 0; text-align: center; font-family: var(--display); letter-spacing: 1px; color: var(--text-faint); font-size: 12px; }
+
+/* ---------- selector row ---------- */
+.shelf { display: grid; grid-template-columns: repeat(9, minmax(110px, 1fr)); gap: 8px; overflow-x: auto; padding-bottom: 4px; }
+.tile {
+  text-align: left; cursor: pointer; padding: 10px 12px; border-radius: 4px;
+  background: var(--panel); border: 1px solid var(--border); border-top: 2px solid transparent;
+  color: var(--text); font-family: var(--body); transition: border-color .15s, background .15s;
+}
+.tile:hover { border-color: #3a3a42; }
+.tile.on { border-top-color: var(--red-bright); background: var(--panel-2); }
+.tile .nm { font-family: var(--display); font-size: 13px; letter-spacing: .5px; text-transform: uppercase; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tile .rt { display: block; font-size: 12px; color: var(--gold-bright); margin-top: 3px; }
+.tile .bar { height: 3px; margin-top: 6px; }
+.hint, .source { text-align: center; color: var(--text-faint); font-size: 12px; margin-top: 8px; }
+.source { margin-top: 2px; }
+
+/* ---------- responsive ---------- */
+@media (max-width: 1000px) {
+  .stage { grid-template-columns: 1fr 1fr; }
+  .pedestal { grid-column: 1 / -1; order: -1; height: 420px; }
+  .shelf { grid-template-columns: repeat(9, 120px); }
+}
+@media (max-width: 640px) {
+  .app { padding: 14px 16px 20px; }
+  .stage { grid-template-columns: 1fr; }
+  .pedestal { height: 360px; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand">MMA Guard <span>Breakdown</span><small>Nine striking guards, rated out of 10 for MMA</small></div>
+    <div class="sortbox" role="group" aria-label="Sort order">
+      <button data-sort="paper" class="on">Paper order</button>
+      <button data-sort="rating">Top rated</button>
+    </div>
+  </header>
+
+  <main class="stage">
+    <section class="left">
+      <div class="rank-tag" id="rarity">Rank 1 of 9</div>
+      <h1 class="guard-name" id="name">High Guard</h1>
+      <p class="tagline" id="tagline"></p>
+      <div class="rating-row">
+        <div class="rating-num" id="rating">9<small>/10</small></div>
+        <div class="rating-meta">
+          <div class="lbl">MMA rating</div>
+          <div class="bar"><i id="ratingbar"></i></div>
+          <div class="rank-line" id="rankline"></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>How it works</h3>
+        <p id="how"></p>
+      </div>
+      <div class="card">
+        <h3>Fighters who use it</h3>
+        <div class="fighters" id="fighters"></div>
+      </div>
+    </section>
+
+    <section class="pedestal" aria-live="polite">
+      <div class="counter" id="counter">1 / 9</div>
+      <div class="platform"></div>
+      <div class="figure-wrap" id="figWrap"><img id="guardImg" alt=""><svg id="figure" viewBox="40 30 240 440" aria-label="Fighter showing the guard"></svg></div>
+      <button class="nav-arrow prev" id="prev" aria-label="Previous guard">‹</button>
+      <button class="nav-arrow next" id="next" aria-label="Next guard">›</button>
+    </section>
+
+    <section class="right">
+      <div class="card pros"><h3>Advantages</h3><ul class="list" id="pros"></ul></div>
+      <div class="card cons"><h3>Disadvantages</h3><ul class="list" id="cons"></ul></div>
+      <div class="card vs">
+        <div class="col good"><h4>STRONG VS</h4><div class="fighters" id="strong"></div></div>
+        <div class="col bad"><h4>WEAK VS</h4><div class="fighters" id="weak"></div></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="shelf" id="shelf" role="listbox" aria-label="Guards"></div>
+    <div class="hint">Use ← → or click a guard to switch</div>
+    <div class="source">Source: “MMA Striking Guards and Defensive Styles”</div>
+  </footer>
+</div>
+
+<script>
+/* ---------------- data (from "MMA Striking Guards and Defensive Styles") ---------------- */
+const GUARDS = [
+  {
+    id: "high", name: "High Guard", rating: 9,
+    tagline: "The safest, most universally effective defensive system in MMA.",
+    how: "Both hands sit around the temples or forehead with the elbows tight, so punches land on gloves and forearms instead of clean. The best users watch through it, parry, and fire back the moment the opponent finishes.",
+    pros: [
+      "Absorbs punches on the gloves and forearms instead of the face",
+      "Lets you walk through offense and return combinations immediately",
+      "Stays defensively responsible while still in position to counter",
+      "Holds up when pocket exchanges get chaotic",
+      "Reliable at virtually every level of MMA"
+    ],
+    cons: [
+      "Over-reliance gives up body shots and kicks",
+      "Doesn't move you out of danger on its own",
+      "Can cost vision and slow reactions to wrestling"
+    ],
+    fighters: ["Petr Yan", "Ilia Topuria", "Jack Della Maddalena", "Dustin Poirier"],
+    strong: ["Punches", "Pocket exchanges", "Pressure boxing"],
+    weak: ["Body shots", "Kicks", "Takedowns"],
+    pose: "high"
+  },
+  {
+    id: "shell", name: "Tight Shell", rating: 7.5,
+    tagline: "An emergency bunker: two forearms welded into a wall in front of the head.",
+    how: "Instead of just keeping the hands high, the forearms come tightly together to build a wall over the face. Used to ride out extended combinations, then open up and counter once the opponent stops.",
+    pros: [
+      "Extremely hard to land a clean head punch through",
+      "Lets a pressure fighter walk through punches and force opponents back",
+      "Great for surviving long combinations before countering"
+    ],
+    cons: [
+      "Sacrifices vision",
+      "Fewer countering opportunities while shelled",
+      "Exposes the body",
+      "Opponents can use it to enter the clinch or shoot takedowns",
+      "Too limiting to build an entire MMA defense around"
+    ],
+    fighters: ["Petr Yan", "Paulo Costa", "Yoel Romero"],
+    strong: ["Head punches", "Long combinations"],
+    weak: ["Body shots", "Clinch entries", "Takedowns"],
+    pose: "shell"
+  },
+  {
+    id: "long", name: "Long Guard", rating: 9.5,
+    tagline: "Stop the punch before it starts: control the opponent before they reach range.",
+    how: "The lead arm extends to intercept, measure distance, block vision, frame and break up combinations while the rear hand stays home on the chin. It is defense that happens before the opponent ever gets to punching range.",
+    pros: [
+      "Controls opponents before they reach punching distance",
+      "Measures range, obstructs vision and disrupts combinations",
+      "Rear hand stays free to protect the chin",
+      "Connects kickboxing to the clinch: frame, then knees and elbows",
+      "Amplified by long reach"
+    ],
+    cons: [
+      "Opponents can attack underneath the extended arm",
+      "Exposes the body and lead leg to kicks",
+      "The lead hand can be hand-fought or manipulated to enter",
+      "Much less useful once the opponent gets inside it"
+    ],
+    fighters: ["Jon Jones", "Israel Adesanya", "Leon Edwards", "Carlos Ulberg"],
+    strong: ["Entries", "Combinations", "Forward pressure"],
+    weak: ["Body kicks", "Leg kicks", "Hand fighting", "Inside range"],
+    pose: "long"
+  },
+  {
+    id: "philly", name: "Philly Shell", rating: 7,
+    tagline: "Elite in the right hands, far more dangerous in MMA than in boxing.",
+    how: "Lead hand low, lead shoulder raised to protect the chin, rear hand catching and parrying. The MMA versions that work lean on great vision and constant parrying rather than dramatic shoulder rolls.",
+    pros: [
+      "Excellent vision of incoming punches",
+      "Slip, roll or parry and return counters immediately",
+      "Shoulder, lead arm and rear hand all deflect punches while walking forward",
+      "Can look elite for the right fighter"
+    ],
+    cons: [
+      "Bladed stance exposes the lead leg to leg kicks",
+      "Wrestling and kicks fundamentally change the problem",
+      "Requires specialized skills",
+      "Many matchup-dependent vulnerabilities"
+    ],
+    fighters: ["Sean Strickland", "Bobby Green"],
+    cautionary: ["James Toney"],
+    strong: ["Punches", "Counter boxing"],
+    weak: ["Leg kicks", "Wrestling", "Kickers"],
+    pose: "philly"
+  },
+  {
+    id: "down", name: "Hands Down", rating: 6.5,
+    tagline: "The highest skill ceiling on the list, with the least margin for error.",
+    how: "No physical barrier. Defense comes from distance, vision, reactions, footwork and head movement: tiny movements that make punches miss, or leaving range entirely, followed by counters.",
+    pros: [
+      "Completely unobstructed vision",
+      "Enormous takedown awareness",
+      "Small movements make punches miss and set up counters",
+      "Unpredictable, loose, speed-based counterattacks"
+    ],
+    cons: [
+      "Highest skill requirement of any guard",
+      "Very little physical protection when a read is wrong",
+      "Breaks down as reaction speed declines",
+      "Needs exceptional attributes to work consistently"
+    ],
+    fighters: ["Anderson Silva", "Israel Adesanya", "Stephen Thompson", "Michael Venom Page", "Bobby Green"],
+    strong: ["Takedowns", "Slow strikers"],
+    weak: ["Misreads", "Fast hands", "Declining reflexes"],
+    pose: "down"
+  },
+  {
+    id: "lowlead", name: "Low Lead Hand", rating: 8.5,
+    tagline: "A strong compromise between traditional protection and hands-down freedom.",
+    how: "The rear hand stays home on the chin while the lead hand hangs around the waist or chest to measure and manipulate. Punches come from unusual positions, which makes them harder to read.",
+    pros: [
+      "Rear hand still protects the chin",
+      "Lead hand measures and manipulates opponents",
+      "Punches are harder to read from a non-traditional position",
+      "Lower hands improve reactions to takedowns and body attacks"
+    ],
+    cons: [
+      "More exposure to head strikes",
+      "Especially open to hooks and overhands on the lead-hand side"
+    ],
+    fighters: ["Conor McGregor", "Alex Pereira", "Israel Adesanya", "Stephen Thompson"],
+    strong: ["Takedowns", "Body attacks"],
+    weak: ["Lead-side hooks", "Overhands"],
+    pose: "lowlead"
+  },
+  {
+    id: "cross", name: "Cross Arm", rating: 6.5,
+    tagline: "A useful situational reaction, not a primary MMA guard.",
+    how: "The forearms overlap or cross over the head and upper body to form an unusual shield, absorbing or redirecting punches before exploding back with counters. Far more common in boxing than MMA.",
+    pros: [
+      "Multiple layers of forearm between the punch and the head",
+      "Surprisingly effective against boxing combinations",
+      "Absorb or redirect, then explode with counters"
+    ],
+    cons: [
+      "Kicks can attack around the structure",
+      "Crossed arms slow pummeling for underhooks",
+      "Harder to defend grappling entries",
+      "Better as one tool in a larger system than as a primary guard"
+    ],
+    fighters: ["Yoel Romero", "Dustin Poirier"],
+    strong: ["Boxing combinations"],
+    weak: ["Kicks", "Clinch", "Grappling entries"],
+    pose: "cross"
+  },
+  {
+    id: "dutch", name: "Dutch Kickboxing", rating: 8.5,
+    tagline: "High hands plus active parries and kick checks, built for punches and kicks.",
+    how: "High hands combined with active parries, forearm blocks and kick checks. Unlike a pure boxing high guard, it has to account for punches and kicks at the same time, and every block flows straight into a combination or low kick.",
+    pros: [
+      "Excellent protection against diverse strikes",
+      "Checks kicks and returns combinations seamlessly",
+      "Defense is part of the offense rather than a separate phase"
+    ],
+    cons: [
+      "Planted feet behind a high guard invite takedowns",
+      "Needs modification against high-level wrestlers"
+    ],
+    fighters: ["Rafael Fiziev", "Petr Yan", "Edson Barboza", "Mateusz Gamrot"],
+    strong: ["Punches", "Kicks", "Kickboxers"],
+    weak: ["Wrestling", "Level changes"],
+    pose: "dutch"
+  },
+  {
+    id: "thai", name: "Muay Thai", rating: 8,
+    tagline: "Rated considerably higher for pure striking, held back by wrestling in MMA.",
+    how: "Upright, hands high and relatively open, ready to parry, frame and check kicks, then transition straight into elbows, knees and clinch control.",
+    pros: [
+      "Parries, frames and checks kicks",
+      "Fast transitions into elbows, knees and the clinch",
+      "Checking and returning kicks makes leg attacks costly",
+      "Composed stance generates huge kick and knee power"
+    ],
+    cons: [
+      "Upright, square posture gives wrestlers access to the hips",
+      "Built for a striking environment, not for defending double legs"
+    ],
+    fighters: ["Jose Aldo", "Rafael Fiziev", "Edson Barboza", "Khalil Rountree Jr."],
+    strong: ["Kicks", "Clinch striking"],
+    weak: ["Double legs", "Wrestlers"],
+    pose: "thai"
+  }
+];
+
+
+/* ---------------- fighter rig ----------------
+   Front-facing, orthodox. "l" = lead (fighter's left, viewer's right), "r" = rear.
+   Each pose sets shoulders (lS/rS), elbows (lE/rE), gloves (lG/rG), knees, feet, head. */
+const BASE = {
+  head: [150, 96], lS: [182, 150], rS: [118, 150],
+  lE: [202, 196], lG: [180, 86], rE: [98, 196], rG: [120, 86],
+  lK: [206, 352], lF: [200, 440], rK: [98, 352], rF: [104, 440],
+  open: 0
+};
+const POSES = {
+  high:    {},
+  shell:   { head: [150, 102], lE: [166, 196], lG: [161, 92], rE: [134, 196], rG: [139, 92] },
+  long:    { lE: [228, 150], lG: [272, 126], rE: [106, 200], rG: [134, 124], open: 1, lK: [210, 350], lF: [218, 440] },
+  philly:  { head: [144, 104], lS: [178, 136], lE: [202, 212], lG: [160, 246], rE: [104, 198], rG: [130, 124], lK: [210, 352], lF: [216, 440], rK: [100, 350], rF: [96, 440] },
+  down:    { head: [148, 94], lE: [200, 218], lG: [206, 278], rE: [100, 218], rG: [96, 278] },
+  lowlead: { lE: [204, 214], lG: [196, 264], rE: [104, 200], rG: [134, 122] },
+  cross:   { head: [150, 100], lE: [206, 128], lG: [126, 110], rE: [102, 214], rG: [176, 210] },
+  dutch:   { lE: [204, 196], lG: [182, 86], rE: [96, 198], rG: [118, 86], lK: [206, 300], lF: [192, 388] },
+  thai:    { head: [150, 92], lE: [214, 180], lG: [192, 106], rE: [94, 186], rG: [110, 108], lK: [186, 350], lF: [184, 432], rK: [116, 350], rF: [116, 440], open: 1 }
+};
+const pose = id => Object.assign({}, BASE, POSES[id]);
+
+const SKIN = "#8d8d96", SKIN_D = "#62626b", SHORTS = "#1f1f25";
+const GLOVE = "#c8152f", GLOVE_D = "#7d0d1d";
+
+function limb(a, b, w, col) {
+  return `<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" stroke="${col}" stroke-width="${w}" stroke-linecap="round"/>`;
+}
+function glove(p, col, dark, open) {
+  if (open) {
+    return `<ellipse cx="${p[0]}" cy="${p[1]}" rx="15" ry="19" fill="${col}" stroke="${dark}" stroke-width="3"/>` +
+           `<ellipse cx="${p[0] - 4}" cy="${p[1] - 6}" rx="5" ry="6" fill="rgba(255,255,255,.35)"/>`;
+  }
+  return `<circle cx="${p[0]}" cy="${p[1]}" r="18" fill="${col}" stroke="${dark}" stroke-width="3"/>` +
+         `<circle cx="${p[0] - 5}" cy="${p[1] - 6}" r="6" fill="rgba(255,255,255,.35)"/>`;
+}
+function figureSVG(P, col, dark) {
+  const lH = [164, 270], rH = [136, 270];
+  const torso = `M${P.rS[0] - 6},${P.rS[1]} Q150,${Math.min(P.lS[1], P.rS[1]) - 8} ${P.lS[0] + 6},${P.lS[1]}
+                 L${lH[0] + 8},${lH[1]} L${rH[0] - 8},${rH[1]} Z`;
+  return `
+    ${limb(rH, P.rK, 32, SKIN_D)}${limb(P.rK, P.rF, 27, SKIN_D)}
+    <ellipse cx="${P.rF[0] - 4}" cy="${P.rF[1] + 4}" rx="18" ry="7" fill="${SKIN_D}"/>
+    ${limb(lH, P.lK, 32, SKIN)}${limb(P.lK, P.lF, 27, SKIN)}
+    <ellipse cx="${P.lF[0] + 4}" cy="${P.lF[1] + 4}" rx="18" ry="7" fill="${SKIN}"/>
+    <path d="M${rH[0] - 22},${lH[1] - 14} L${lH[0] + 22},${lH[1] - 14} L${lH[0] + 26},${lH[1] + 34}
+             L152,${lH[1] + 30} L${rH[0] - 26},${lH[1] + 34} Z" fill="${SHORTS}"/>
+    <rect x="${rH[0] - 22}" y="${lH[1] - 16}" width="${lH[0] - rH[0] + 44}" height="9" rx="3" fill="#2c2c33"/>
+    <path d="${torso}" fill="${SKIN}"/>
+    <path d="M${150 - 14},${P.lS[1] + 46} Q150,${P.lS[1] + 54} ${150 + 14},${P.lS[1] + 46}" stroke="${SKIN_D}" stroke-width="3" fill="none" opacity=".6"/>
+    <line x1="150" y1="${P.lS[1] + 64}" x2="150" y2="${lH[1] - 24}" stroke="${SKIN_D}" stroke-width="2.5" opacity=".45"/>
+    <rect x="${P.head[0] - 11}" y="${P.head[1] + 18}" width="22" height="${Math.max(16, P.rS[1] - P.head[1] - 14)}" fill="${SKIN_D}"/>
+    <circle cx="${P.head[0]}" cy="${P.head[1]}" r="27" fill="${SKIN}"/>
+    <path d="M${P.head[0] - 27},${P.head[1] - 4} Q${P.head[0] - 24},${P.head[1] - 34} ${P.head[0]},${P.head[1] - 31}
+             Q${P.head[0] + 26},${P.head[1] - 33} ${P.head[0] + 27},${P.head[1] - 4}
+             Q${P.head[0] + 14},${P.head[1] - 18} ${P.head[0]},${P.head[1] - 16} Q${P.head[0] - 14},${P.head[1] - 18} ${P.head[0] - 27},${P.head[1] - 4} Z" fill="#3d3d44"/>
+    <path d="M${P.head[0] - 13},${P.head[1] - 3} l9,3 M${P.head[0] + 13},${P.head[1] - 3} l-9,3" stroke="#3d3d44" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="${P.head[0] - 8}" cy="${P.head[1] + 3}" r="2.6" fill="#3d3d44"/>
+    <circle cx="${P.head[0] + 8}" cy="${P.head[1] + 3}" r="2.6" fill="#3d3d44"/>
+    <path d="M${P.head[0] - 6},${P.head[1] + 15} h12" stroke="#4a4a52" stroke-width="2.5" stroke-linecap="round"/>
+    ${limb(P.rS, P.rE, 25, SKIN_D)}${limb(P.rE, P.rG, 21, SKIN_D)}
+    ${glove(P.rG, dark, "rgba(0,0,0,.45)", 0)}
+    ${limb(P.lS, P.lE, 25, SKIN)}${limb(P.lE, P.lG, 21, SKIN)}
+    ${glove(P.lG, col, "rgba(0,0,0,.35)", P.open > .5)}
+  `;
+}
+
+/* ---------------- state + render ---------------- */
+let order = GUARDS.map((_, i) => i);
+let cur = 0;                      // index into order
+let shown = pose("high");         // currently drawn pose (tweened)
+let tween = null;
+
+const $ = id => document.getElementById(id);
+const fig = $("figure");
+const img = $("guardImg");
+const IMG_DIR = "guards/";
+const hasImg = {};   // pose id -> true/false once the image has loaded or failed
+
+// Preload every guard image; any that fail fall back to the vector figure.
+GUARDS.forEach(g => {
+  const pre = new Image();
+  pre.onload = () => { hasImg[g.pose] = true; };
+  pre.onerror = () => { hasImg[g.pose] = false; if (GUARDS[order[cur]].pose === g.pose) showFigure(g); };
+  pre.src = IMG_DIR + g.pose + ".png";
+});
+
+function showFigure(g) {
+  const wrap = $("figWrap");
+  if (hasImg[g.pose] === false) {
+    wrap.classList.remove("has-img");
+    animateTo(pose(g.pose));
+    return;
+  }
+  wrap.classList.add("has-img");
+  img.alt = `Fighter in the ${g.name} guard`;
+  img.classList.add("fade");
+  setTimeout(() => {
+    img.src = IMG_DIR + g.pose + ".png";
+    img.onload = () => img.classList.remove("fade");
+    if (img.complete) img.classList.remove("fade");
+  }, 120);
+}
+const byRating = [...GUARDS].sort((a, b) => b.rating - a.rating);
+
+function lerpPose(a, b, t) {
+  const o = {};
+  for (const k in b) o[k] = Array.isArray(b[k]) ? [a[k][0] + (b[k][0] - a[k][0]) * t, a[k][1] + (b[k][1] - a[k][1]) * t] : a[k] + (b[k] - a[k]) * t;
+  return o;
+}
+const easeInOut = t => t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+
+function animateTo(target) {
+  cancelAnimationFrame(tween);
+  const from = shown, start = performance.now(), dur = 320;
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const step = now => {
+    const t = reduce ? 1 : Math.min(1, (now - start) / dur);
+    shown = lerpPose(from, target, easeInOut(t));
+    fig.innerHTML = figureSVG(shown, GLOVE, GLOVE_D);
+    if (t < 1) tween = requestAnimationFrame(step);
+  };
+  tween = requestAnimationFrame(step);
+}
+
+function chips(list, cls = "") { return list.map(n => `<span class="chip ${cls}">${n}</span>`).join(""); }
+
+function render() {
+  const g = GUARDS[order[cur]];
+  $("name").textContent = g.name;
+  $("tagline").textContent = g.tagline;
+  $("rating").innerHTML = `${g.rating}<small>/10</small>`;
+  $("ratingbar").style.width = g.rating * 10 + "%";
+  const rank = byRating.filter(x => x.rating > g.rating).length + 1;
+  const tied = byRating.filter(x => x.rating === g.rating).length > 1;
+  $("rarity").textContent = `Rank ${tied ? "T-" : ""}${rank} of ${GUARDS.length}`;
+  $("rankline").textContent = tied ? `Tied with ${byRating.filter(x => x.rating === g.rating && x !== g).map(x => x.name).join(", ")}` : "";
+  $("how").textContent = g.how;
+  $("fighters").innerHTML = chips(g.fighters) + (g.cautionary ? chips(g.cautionary.map(n => n + " (counter-example)"), "warn") : "");
+  $("pros").innerHTML = g.pros.map(p => `<li>${p}</li>`).join("");
+  $("cons").innerHTML = g.cons.map(p => `<li>${p}</li>`).join("");
+  $("strong").innerHTML = chips(g.strong);
+  $("weak").innerHTML = chips(g.weak);
+  $("counter").textContent = `${cur + 1} / ${GUARDS.length}`;
+
+  showFigure(g);
+
+  document.querySelectorAll(".tile").forEach((t, i) => {
+    const on = i === cur;
+    t.classList.toggle("on", on);
+    t.setAttribute("aria-selected", on);
+    if (on) { const sh = $("shelf"); sh.scrollTo({ left: t.offsetLeft - sh.clientWidth / 2 + t.offsetWidth / 2 }); }
+  });
+}
+
+function buildShelf() {
+  $("shelf").innerHTML = order.map((gi, i) => {
+    const g = GUARDS[gi];
+    return `<button class="tile" role="option" data-i="${i}">
+      <span class="nm">${g.name}</span>
+      <span class="rt">${g.rating} / 10</span>
+      <span class="bar" style="display:block"><i style="width:${g.rating * 10}%"></i></span>
+    </button>`;
+  }).join("");
+  document.querySelectorAll(".tile").forEach(t => t.addEventListener("click", () => { cur = +t.dataset.i; render(); }));
+}
+
+function go(d) { cur = (cur + d + order.length) % order.length; render(); }
+$("prev").onclick = () => go(-1);
+$("next").onclick = () => go(1);
+document.addEventListener("keydown", e => {
+  if (e.key === "ArrowRight") go(1);
+  if (e.key === "ArrowLeft") go(-1);
+});
+
+document.querySelectorAll(".sortbox button").forEach(b => b.addEventListener("click", () => {
+  const selectedId = GUARDS[order[cur]].id;
+  document.querySelectorAll(".sortbox button").forEach(x => x.classList.toggle("on", x === b));
+  order = GUARDS.map((_, i) => i);
+  if (b.dataset.sort === "rating") order.sort((a, c) => GUARDS[c].rating - GUARDS[a].rating);
+  cur = order.findIndex(i => GUARDS[i].id === selectedId);
+  buildShelf(); render();
+}));
+
+/* swipe on the stage */
+let sx = null;
+$("figure").parentElement.addEventListener("touchstart", e => { sx = e.touches[0].clientX; }, { passive: true });
+$("figure").parentElement.addEventListener("touchend", e => {
+  if (sx === null) return;
+  const dx = e.changedTouches[0].clientX - sx;
+  if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1);
+  sx = null;
+});
+
+
+buildShelf();
+render();
+</script>
+</body>
+</html>

@@ -50,14 +50,6 @@ body {
 .brand { font-family: var(--display); font-weight: 700; font-size: 28px; letter-spacing: 1px; text-transform: uppercase; line-height: 1.1; }
 .brand span { color: var(--red-bright); }
 .brand small { display: block; font-family: var(--body); font-weight: 400; font-size: 13px; color: var(--text-dim); letter-spacing: .3px; text-transform: none; margin-top: 4px; }
-.sortbox { display: flex; gap: 6px; }
-.sortbox button {
-  font-family: var(--display); text-transform: uppercase; letter-spacing: 1px; font-size: 13px;
-  padding: 8px 16px; background: var(--panel); border: 1px solid var(--border); color: var(--text-dim);
-  cursor: pointer; border-radius: 4px; transition: all .15s;
-}
-.sortbox button:hover { border-color: var(--gold); color: var(--text); }
-.sortbox button.on { background: linear-gradient(180deg, var(--red-bright), var(--red)); border-color: var(--red-bright); color: #fff; }
 
 /* ---------- main 3-column layout ---------- */
 .stage {
@@ -161,10 +153,6 @@ body {
 <div class="app">
   <header class="topbar">
     <div class="brand">MMA Guard <span>Breakdown</span><small>Nine striking guards, rated out of 10 for MMA</small></div>
-    <div class="sortbox" role="group" aria-label="Sort order">
-      <button data-sort="paper" class="on">Paper order</button>
-      <button data-sort="rating">Top rated</button>
-    </div>
   </header>
 
   <main class="stage">
@@ -194,8 +182,8 @@ body {
       <div class="counter" id="counter">1 / 9</div>
       <div class="platform"></div>
       <div class="figure-wrap" id="figWrap"><img id="guardImg" alt=""><svg id="figure" viewBox="40 30 240 440" aria-label="Fighter showing the guard"></svg></div>
-      <button class="nav-arrow prev" id="prev" aria-label="Previous guard">‹</button>
-      <button class="nav-arrow next" id="next" aria-label="Next guard">›</button>
+      <button class="nav-arrow prev" id="prev" aria-label="Previous guard">‚Äπ</button>
+      <button class="nav-arrow next" id="next" aria-label="Next guard">‚Ä∫</button>
     </section>
 
     <section class="right">
@@ -210,8 +198,8 @@ body {
 
   <footer>
     <div class="shelf" id="shelf" role="listbox" aria-label="Guards"></div>
-    <div class="hint">Use ← → or click a guard to switch</div>
-    <div class="source">Source: “MMA Striking Guards and Defensive Styles”</div>
+    <div class="hint">Use ‚Üê ‚Üí or click a guard to switch</div>
+    <div class="source">Source: ‚ÄúMMA Striking Guards and Defensive Styles‚Äù</div>
   </footer>
 </div>
 
@@ -472,7 +460,8 @@ function figureSVG(P, col, dark) {
 }
 
 /* ---------------- state + render ---------------- */
-let order = GUARDS.map((_, i) => i);
+// Always shown highest-rated first (ties keep the paper's order).
+const order = GUARDS.map((_, i) => i).sort((a, c) => GUARDS[c].rating - GUARDS[a].rating);
 let cur = 0;                      // index into order
 let shown = pose("high");         // currently drawn pose (tweened)
 let tween = null;
@@ -578,15 +567,6 @@ document.addEventListener("keydown", e => {
   if (e.key === "ArrowRight") go(1);
   if (e.key === "ArrowLeft") go(-1);
 });
-
-document.querySelectorAll(".sortbox button").forEach(b => b.addEventListener("click", () => {
-  const selectedId = GUARDS[order[cur]].id;
-  document.querySelectorAll(".sortbox button").forEach(x => x.classList.toggle("on", x === b));
-  order = GUARDS.map((_, i) => i);
-  if (b.dataset.sort === "rating") order.sort((a, c) => GUARDS[c].rating - GUARDS[a].rating);
-  cur = order.findIndex(i => GUARDS[i].id === selectedId);
-  buildShelf(); render();
-}));
 
 /* swipe on the stage */
 let sx = null;

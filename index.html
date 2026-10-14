@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>MMA Guard Breakdown</title>
+<title>MMA Guard Breakdown | From The Pocket</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2264%22%20height%3D%2264%22%20viewBox%3D%220%200%20512%20512%22%3E%3Crect%20width%3D%22512%22%20height%3D%22512%22%20rx%3D%2296%22%20fill%3D%22%23111318%22/%3E%3Ctext%20x%3D%22256%22%20y%3D%22236%22%20text-anchor%3D%22middle%22%20font-family%3D%22Inter%2C%20Arial%2C%20sans-serif%22%20font-weight%3D%22700%22%20font-size%3D%22200%22%20fill%3D%22%2300c896%22%3EFTP%3C/text%3E%3Crect%20x%3D%22146%22%20y%3D%22360%22%20width%3D%2236%22%20height%3D%2256%22%20rx%3D%225%22%20fill%3D%22%2300c896%22/%3E%3Crect%20x%3D%22192%22%20y%3D%22333%22%20width%3D%2236%22%20height%3D%2283%22%20rx%3D%225%22%20fill%3D%22%2300c896%22/%3E%3Crect%20x%3D%22238%22%20y%3D%22305%22%20width%3D%2236%22%20height%3D%22111%22%20rx%3D%225%22%20fill%3D%22%2300c896%22/%3E%3Crect%20x%3D%22284%22%20y%3D%22333%22%20width%3D%2236%22%20height%3D%2283%22%20rx%3D%225%22%20fill%3D%22%23f87171%22/%3E%3Crect%20x%3D%22330%22%20y%3D%22360%22%20width%3D%2236%22%20height%3D%2256%22%20rx%3D%225%22%20fill%3D%22%23f87171%22/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -49,6 +50,13 @@ body {
 .topbar { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; border-bottom: 1px solid var(--border); padding-bottom: 14px; }
 .brand { font-family: var(--display); font-weight: 700; font-size: 28px; letter-spacing: 1px; text-transform: uppercase; line-height: 1.1; }
 .brand span { color: var(--red-bright); }
+.ftp-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); }
+.ftp-mark { display: block; flex: none; border-radius: 8px; box-shadow: 0 0 0 1px var(--border); }
+.ftp-brand .ftp-name { font-family: var(--display); font-weight: 600; font-size: 15px; letter-spacing: 1.5px; text-transform: uppercase; line-height: 1.1; }
+.ftp-brand .ftp-name small { display: block; font-family: var(--body); font-weight: 400; font-size: 11px; letter-spacing: .3px; text-transform: none; color: var(--text-faint); margin-top: 2px; }
+.ftp-credit { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 14px; color: var(--text-dim); font-size: 12px; letter-spacing: .3px; }
+.ftp-credit b { font-family: var(--display); font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--text); }
+@media (max-width: 640px) { .ftp-brand .ftp-name small { display: none; } }
 .brand small { display: block; font-family: var(--body); font-weight: 400; font-size: 13px; color: var(--text-dim); letter-spacing: .3px; text-transform: none; margin-top: 4px; }
 
 /* ---------- main 3-column layout ---------- */
@@ -155,6 +163,7 @@ body {
 <div class="app">
   <header class="topbar">
     <div class="brand">MMA Guard <span>Breakdown</span><small>Nine striking guards, rated out of 10 for MMA</small></div>
+    <div class="ftp-brand"><svg class="ftp-mark" width="38" height="38" viewBox="0 0 512 512" role="img" aria-label="FTP"><rect width="512" height="512" rx="96" fill="#111318"/><text x="256" y="236" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-weight="700" font-size="200" fill="#00c896">FTP</text><rect x="146" y="360" width="36" height="56" rx="5" fill="#00c896"/><rect x="192" y="333" width="36" height="83" rx="5" fill="#00c896"/><rect x="238" y="305" width="36" height="111" rx="5" fill="#00c896"/><rect x="284" y="333" width="36" height="83" rx="5" fill="#f87171"/><rect x="330" y="360" width="36" height="56" rx="5" fill="#f87171"/></svg><span class="ftp-name">From The Pocket<small>MMA analysis tools</small></span></div>
   </header>
 
   <main class="stage">
@@ -202,6 +211,7 @@ body {
     <div class="shelf" id="shelf" role="listbox" aria-label="Guards"></div>
     <div class="hint">Use the arrow keys or click a guard to switch</div>
     <div class="source">Source: &ldquo;MMA Striking Guards and Defensive Styles&rdquo;</div>
+    <div class="ftp-credit"><svg class="ftp-mark" width="20" height="20" viewBox="0 0 512 512" role="img" aria-label="FTP"><rect width="512" height="512" rx="96" fill="#111318"/><text x="256" y="236" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-weight="700" font-size="200" fill="#00c896">FTP</text><rect x="146" y="360" width="36" height="56" rx="5" fill="#00c896"/><rect x="192" y="333" width="36" height="83" rx="5" fill="#00c896"/><rect x="238" y="305" width="36" height="111" rx="5" fill="#00c896"/><rect x="284" y="333" width="36" height="83" rx="5" fill="#f87171"/><rect x="330" y="360" width="36" height="56" rx="5" fill="#f87171"/></svg><span>Built by <b>From The Pocket</b></span></div>
   </footer>
 </div>
 
